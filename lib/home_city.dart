@@ -100,96 +100,94 @@ class HomeCityState extends State<HomeCity> {
             ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: screenwidth * 0.42,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.all(7.0),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(52, 47, 47, 0.7),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Text(
-                  'AQI',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
+              Column(
+                children: [
+                  Container(
+                    width: screenwidth * 0.42,
+                    padding: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(7.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(52, 47, 47, 0.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Text(
+                      'AQI',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    width: screenwidth * 0.42,
+                    padding: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(7.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(52, 47, 47, 0.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Text(
+                      'UV index',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    width: screenwidth * 0.42,
+                    padding: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(7.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(52, 47, 47, 0.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Text(
+                      'Dew Point',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
-              Container(
-                width: screenwidth * 0.42,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.all(7.0),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(52, 47, 47, 0.7),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Text(
-                  'Visibility',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                width: screenwidth * 0.42,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.all(7.0),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(52, 47, 47, 0.7),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Text(
-                  'UV index',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-              ),
-              Container(
-                width: screenwidth * 0.42,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.all(7.0),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(52, 47, 47, 0.7),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Text(
-                  'Pressure',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                width: screenwidth * 0.42,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.all(7.0),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(52, 47, 47, 0.7),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Text(
-                  'Dew Point',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-              ),
-              Container(
-                width: screenwidth * 0.42,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.all(7.0),
-                decoration: BoxDecoration(
-                  color: Color.fromRGBO(52, 47, 47, 0.7),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: Text(
-                  'Wind',
-                  style: TextStyle(fontSize: 20, color: Colors.white),
-                ),
-              ),
+              Column(
+                children: [
+                  Container(
+                    width: screenwidth * 0.42,
+                    padding: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(7.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(52, 47, 47, 0.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Text(
+                      'Visibility',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    width: screenwidth * 0.42,
+                    padding: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(7.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(52, 47, 47, 0.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Text(
+                      'Pressure',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                  Container(
+                    width: screenwidth * 0.42,
+                    padding: EdgeInsets.all(20.0),
+                    margin: EdgeInsets.all(7.0),
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(52, 47, 47, 0.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Text(
+                      'Wind',
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                ],
+              )
             ],
           ),
           Container(
