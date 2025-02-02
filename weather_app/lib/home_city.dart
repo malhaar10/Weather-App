@@ -24,11 +24,11 @@ class HomeCity extends StatelessWidget {
                 ),
               ),
             ),
-            Column(
-              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            ListView(
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
               children: [
                 Text('    ',
-                    style: TextStyle(fontSize: 40, color: Colors.white)),
+                    style: TextStyle(fontSize: 30, color: Colors.white)),
                 Container(
                   width: screenwidth * 0.95,
                   height: screenheight * 0.3,
@@ -45,10 +45,27 @@ class HomeCity extends StatelessWidget {
                     style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
                 ),
+                Container(
+                  width: screenwidth * 0.95,
+                  height: screenheight * 0.2,
+                  padding:
+                      EdgeInsets.symmetric(vertical: 40.0, horizontal: 40.0),
+                  margin:
+                      EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(52, 47, 47, 0.7),
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: Text(
+                    'Hourly weather',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
+                      width: screenwidth * 0.42,
                       padding: EdgeInsets.all(20.0),
                       margin: EdgeInsets.all(7.0),
                       decoration: BoxDecoration(
@@ -56,11 +73,12 @@ class HomeCity extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       child: Text(
-                        'Text 1 in first row',
+                        'AQI',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
                     Container(
+                      width: screenwidth * 0.42,
                       padding: EdgeInsets.all(20.0),
                       margin: EdgeInsets.all(7.0),
                       decoration: BoxDecoration(
@@ -68,7 +86,7 @@ class HomeCity extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       child: Text(
-                        'Text 1 in first row',
+                        'Visibility',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
@@ -78,6 +96,7 @@ class HomeCity extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
+                      width: screenwidth * 0.42,
                       padding: EdgeInsets.all(20.0),
                       margin: EdgeInsets.all(7.0),
                       decoration: BoxDecoration(
@@ -85,11 +104,12 @@ class HomeCity extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       child: Text(
-                        'Text 1 in first row',
+                        'UV index',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
                     Container(
+                      width: screenwidth * 0.42,
                       padding: EdgeInsets.all(20.0),
                       margin: EdgeInsets.all(7.0),
                       decoration: BoxDecoration(
@@ -97,7 +117,7 @@ class HomeCity extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       child: Text(
-                        'Text 1 in first row',
+                        'Pressure',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
@@ -107,6 +127,7 @@ class HomeCity extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
+                      width: screenwidth * 0.42,
                       padding: EdgeInsets.all(20.0),
                       margin: EdgeInsets.all(7.0),
                       decoration: BoxDecoration(
@@ -114,11 +135,12 @@ class HomeCity extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       child: Text(
-                        'Text 1 in first row',
+                        'Dew Point',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
                     Container(
+                      width: screenwidth * 0.42,
                       padding: EdgeInsets.all(20.0),
                       margin: EdgeInsets.all(7.0),
                       decoration: BoxDecoration(
@@ -126,98 +148,43 @@ class HomeCity extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       child: Text(
-                        'Text 1 in first row',
+                        'Wind',
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      margin: EdgeInsets.all(7.0),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(52, 47, 47, 0.7),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Text(
-                        'Text 1 in first row',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      margin: EdgeInsets.all(7.0),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(52, 47, 47, 0.7),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Text(
-                        'Text 1 in first row',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                  ],
+                Container(
+                  width: screenwidth * 0.95,
+                  height: screenheight * 0.19,
+                  padding:
+                      EdgeInsets.symmetric(vertical: 40.0, horizontal: 40.0),
+                  margin:
+                      EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(52, 47, 47, 0.7),
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: Text(
+                    'Sunrise & Sunset',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      margin: EdgeInsets.all(7.0),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(52, 47, 47, 0.7),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Text(
-                        'Text 1 in first row',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      margin: EdgeInsets.all(7.0),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(52, 47, 47, 0.7),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Text(
-                        'Text 1 in first row',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      margin: EdgeInsets.all(7.0),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(52, 47, 47, 0.7),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Text(
-                        'Text 1 in first row',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      margin: EdgeInsets.all(7.0),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(52, 47, 47, 0.7),
-                        borderRadius: BorderRadius.circular(15.0),
-                      ),
-                      child: Text(
-                        'Text 1 in first row',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ),
-                  ],
+                Container(
+                  width: screenwidth * 0.95,
+                  height: screenheight * 0.19,
+                  padding:
+                      EdgeInsets.symmetric(vertical: 40.0, horizontal: 40.0),
+                  margin:
+                      EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(52, 47, 47, 0.7),
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  child: Text(
+                    'Moon phases',
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -227,28 +194,3 @@ class HomeCity extends StatelessWidget {
     );
   }
 }
-
-// Future<Position> _determinePosition() async {
-//   bool serviceEnabled;
-//   LocationPermission permission;
-
-//   serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//   if (!serviceEnabled) {
-//     return Future.error('Location services are disabled.');
-//   }
-
-//   permission = await Geolocator.checkPermission();
-//   if (permission == LocationPermission.denied) {
-//     permission = await Geolocator.requestPermission();
-//     if (permission == LocationPermission.denied) {
-//       return Future.error('Location permissions are denied');
-//     }
-//   }
-
-//   if (permission == LocationPermission.deniedForever) {
-//     return Future.error(
-//         'Location permissions are permanently denied, we cannot request permissions.');
-//   }
-
-//   return await Geolocator.getCurrentPosition();
-// }

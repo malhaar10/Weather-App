@@ -14,5 +14,3 @@ class WeatherApp extends StatelessWidget {
     );
   }
 }
-
-//AQI, UV index, Pressure, Visibility, Sunrise & sunset, Moon, Dew point, hourly weather, precipitation, wind
