@@ -73,16 +73,35 @@ class HomeCityState extends State<HomeCity> {
           locationHeader(),
           datetime(),
           Container(
-            width: screenwidth * 0.95,
-            height: screenheight * 0.3,
+            // width: screenwidth * 0.95,
+            // height: screenheight * 0.4,
             padding: EdgeInsets.symmetric(vertical: 40.0, horizontal: 40.0),
             margin: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
             decoration: BoxDecoration(
               color: Color.fromRGBO(52, 47, 47, 0.7),
               borderRadius: BorderRadius.circular(15.0),
             ),
-            child: Text(
-              _weather?.weatherDescription ?? "",
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Weather: ${_weather?.weatherMain ?? ""}',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+                getIcon(),
+                Text(
+                  'Temperature: ${_weather?.temperature?.celsius?.toStringAsFixed(1) ?? ""} °C',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+                Text(
+                  'Maximum: ${_weather?.tempMax?.celsius?.toStringAsFixed(1) ?? ""} °C',
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+                Text(
+                    'Minimum: ${_weather?.tempMin?.celsius?.toStringAsFixed(1) ?? ""} °C',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+                Text('Feels Like: ${_weather?.tempFeelsLike ?? ""}',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
+              ],
             ),
           ),
           Container(
@@ -155,10 +174,8 @@ class HomeCityState extends State<HomeCity> {
                       color: Color.fromRGBO(52, 47, 47, 0.7),
                       borderRadius: BorderRadius.circular(15.0),
                     ),
-                    child: Text(
-                      'Visibility',
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
+                    child: Text('${_weather?.cloudiness}',
+                        style: TextStyle(fontSize: 20, color: Colors.white)),
                   ),
                   Container(
                     width: screenwidth * 0.42,
@@ -199,9 +216,17 @@ class HomeCityState extends State<HomeCity> {
               color: Color.fromRGBO(52, 47, 47, 0.7),
               borderRadius: BorderRadius.circular(15.0),
             ),
-            child: Text(
-              'Sunrise & Sunset',
-              style: TextStyle(fontSize: 20, color: Colors.white),
+            child: Column(
+              children: [
+                Text(
+                  'Sunrise: ${_weather?.sunrise}',
+                  style: TextStyle(fontSize: 10, color: Colors.white),
+                ),
+                Text(
+                  'Sunset: ${_weather?.sunset}',
+                  style: TextStyle(fontSize: 10, color: Colors.white),
+                ),
+              ],
             ),
           ),
           Container(
@@ -241,5 +266,14 @@ Widget datetime() {
       Text(DateFormat("d.m.y").format(now),
           style: TextStyle(fontSize: 30, color: Colors.white))
     ],
+  );
+}
+
+Widget getIcon() {
+  return Container(
+    decoration: BoxDecoration(
+        image: DecorationImage(
+            image: NetworkImage(
+                'https://openweathermap.org/img/wn/${_weather?.weatherIcon}@4x.png'))),
   );
 }
