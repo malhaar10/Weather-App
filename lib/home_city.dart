@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather/weather.dart';
-//import 'package:http/http.dart' as http;
+import 'package:air_quality_waqi/air_quality_waqi.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 Weather? _weather;
 List<Weather>? _forecast;
-List<Weather>? _aqi;
+AirQualityWaqiData? _aqi;
 
 class HomeCity extends StatefulWidget {
   const HomeCity({super.key});
@@ -17,7 +19,7 @@ class HomeCity extends StatefulWidget {
 
 class HomeCityState extends State<HomeCity> {
   late final WeatherFactory wf;
-  //late final aqi;
+  late final AirQualityWaqi airquality;
 
   @override
   void initState() {
@@ -52,6 +54,11 @@ class HomeCityState extends State<HomeCity> {
         await wf.fiveDayForecastByLocation(latitude, longitude);
     setState(() {
       _forecast = forecast;
+    });
+
+    airquality = AirQualityWaqi(dotenv.env['AQI_SERVICE_API_KEY']!);
+    airquality.feedFromGeoLocation(latitude, longitude).then((aqi) {
+      _aqi = aqi;
     });
   }
 
@@ -111,7 +118,7 @@ class HomeCityState extends State<HomeCity> {
                     ),
                     Text(
                       '${_weather?.temperature?.celsius?.toStringAsFixed(1) ?? ""}°C',
-                      style: TextStyle(fontSize: 45, color: Colors.white),
+                      style: TextStyle(fontSize: 30, color: Colors.white),
                     ),
                     Text(_weather?.weatherMain ?? "",
                         style: TextStyle(fontSize: 25, color: Colors.white)),
@@ -227,7 +234,7 @@ class HomeCityState extends State<HomeCity> {
                       borderRadius: BorderRadius.circular(25.0),
                     ),
                     child: Text(
-                      'UV index',
+                      'AQI: ${_aqi?.airQualityIndex}',
                       style: TextStyle(fontSize: 17, color: Colors.white),
                     ),
                   ),
