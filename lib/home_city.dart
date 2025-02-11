@@ -163,10 +163,31 @@ class HomeCityState extends State<HomeCity> {
     );
   }
 
-  void getScene() {}
+  WeatherScene? getScene() {
+    var wdes = _weather?.weatherConditionCode;
+    var scene;
+    if (wdes != null) {
+      if (wdes >= 200 && wdes <= 232) {
+        scene = WeatherScene.stormy;
+      } else if (wdes >= 300 && wdes <= 321) {
+        scene = WeatherScene.rainyOvercast;
+      } else if (wdes >= 500 && wdes <= 531) {
+        scene = WeatherScene.showerSleet;
+      } else if (wdes >= 600 && wdes <= 622) {
+        scene = WeatherScene.snowfall;
+      } else if (wdes >= 701 && wdes <= 781) {
+        scene = WeatherScene.sunset;
+      } else if (wdes == 800) {
+        scene = WeatherScene.scorchingSun;
+      } else if (wdes >= 801 && wdes <= 804) {
+        scene = WeatherScene.sunset;
+      }
+    }
+    return scene;
+  }
 
   Widget app_ui() {
-    // var scene =
+    var sCene = getScene();
     var get_aqi = get_aqi_cond();
     var direc = getDirection();
     double screenwidth = MediaQuery.of(context).size.width;
@@ -191,7 +212,7 @@ class HomeCityState extends State<HomeCity> {
         Container(
           width: screenwidth,
           height: screenheight,
-          child: WrapperScene.weather(scene: WeatherScene.sunset),
+          child: WrapperScene.weather(scene: sCene ?? WeatherScene.frosty),
         ),
         ListView(
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 0.0),
@@ -200,13 +221,13 @@ class HomeCityState extends State<HomeCity> {
               height: screenheight * 0.30,
               width: screenwidth * 0.35,
               margin: EdgeInsets.only(
-                  top: screenheight * 0.05,
+                  top: screenheight * 0.3,
                   bottom: screenheight * 0.015,
                   left: screenwidth * 0.04,
                   right: screenwidth * 0.04),
               padding: EdgeInsets.all(20.0),
               decoration: BoxDecoration(
-                  color: Color.fromRGBO(0, 0, 0, 0.4),
+                  //color: Color.fromRGBO(0, 0, 0, 0.6),
                   borderRadius: BorderRadius.circular(25.0)),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -269,7 +290,7 @@ class HomeCityState extends State<HomeCity> {
                     left: screenwidth * 0.04,
                     right: screenwidth * 0.04),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(0, 0, 0, 0.4),
+                    color: Color.fromRGBO(255, 255, 255, 0.25),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Column(
                   //crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -297,7 +318,7 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(0, 0, 0, 0.4),
+                        color: Color.fromRGBO(255, 255, 255, 0.25),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -324,7 +345,7 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(0, 0, 0, 0.4),
+                        color: Color.fromRGBO(255, 255, 255, 0.25),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -354,7 +375,7 @@ class HomeCityState extends State<HomeCity> {
                     left: screenwidth * 0.04,
                     right: screenwidth * 0.04),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(0, 0, 0, 0.4),
+                    color: Color.fromRGBO(255, 255, 255, 0.25),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -380,7 +401,7 @@ class HomeCityState extends State<HomeCity> {
                   left: screenwidth * 0.04,
                   right: screenwidth * 0.04),
               decoration: BoxDecoration(
-                  color: Color.fromRGBO(0, 0, 0, 0.4),
+                  color: Color.fromRGBO(255, 255, 255, 0.25),
                   borderRadius: BorderRadius.circular(25.0)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -410,7 +431,7 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(0, 0, 0, 0.4),
+                        color: Color.fromRGBO(255, 255, 255, 0.25),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -437,19 +458,18 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(0, 0, 0, 0.4),
+                        color: Color.fromRGBO(255, 255, 255, 0.25),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Text(
-                          'Pressure (mmHg)',
+                          'Condition',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: screenheight * 0.015),
                         ),
-                        Text(
-                            '${(_weather?.pressure != null) ? (_weather!.pressure! * 0.75) : null}',
+                        Text('${_weather?.weatherMain}',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: screenheight * 0.027))
@@ -467,7 +487,7 @@ class HomeCityState extends State<HomeCity> {
                     left: screenwidth * 0.04,
                     right: screenwidth * 0.04),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(0, 0, 0, 0.4),
+                    color: Color.fromRGBO(255, 255, 255, 0.25),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
