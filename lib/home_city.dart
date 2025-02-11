@@ -11,15 +11,16 @@ List<Weather>? _forecast;
 AirQualityWaqiData? _aqi;
 
 class HomeCity extends StatefulWidget {
-  const HomeCity({super.key});
+  const HomeCity({Key? key}) : super(key: key);
 
   @override
   State<HomeCity> createState() => HomeCityState();
 }
 
 class HomeCityState extends State<HomeCity> {
-  late final WeatherFactory wf;
-  late final AirQualityWaqi airquality;
+  WeatherFactory? wf;
+  AirQualityWaqi? airquality;
+  Key _key = UniqueKey();
 
   @override
   void initState() {
@@ -31,7 +32,6 @@ class HomeCityState extends State<HomeCity> {
     await Geolocator.checkPermission();
     await Geolocator.requestPermission();
     Position position = await Geolocator.getCurrentPosition(
-        // ignore: deprecated_member_use
         desiredAccuracy: LocationAccuracy.low);
     return {
       'latitude': position.latitude,
@@ -45,28 +45,64 @@ class HomeCityState extends State<HomeCity> {
     double longitude = location['longitude']!;
 
     wf = WeatherFactory(dotenv.env['WEATHER_APPLCATION_API_KEY']!);
-    wf.currentWeatherByLocation(latitude, longitude).then((weather) {
+    try {
+      Weather weather = await wf!.currentWeatherByLocation(latitude, longitude);
       setState(() {
         _weather = weather;
       });
-    });
-    List<Weather> forecast =
-        await wf.fiveDayForecastByLocation(latitude, longitude);
-    setState(() {
-      _forecast = forecast;
-    });
 
-    airquality = AirQualityWaqi(dotenv.env['AQI_SERVICE_API_KEY']!);
-    airquality.feedFromGeoLocation(latitude, longitude).then((aqi) {
-      _aqi = aqi;
+      List<Weather> forecast =
+          await wf!.fiveDayForecastByLocation(latitude, longitude);
+      setState(() {
+        _forecast = forecast;
+      });
+
+      airquality = AirQualityWaqi(dotenv.env['AQI_SERVICE_API_KEY']!);
+      AirQualityWaqiData aqi =
+          await airquality!.feedFromGeoLocation(latitude, longitude);
+      setState(() {
+        _aqi = aqi;
+      });
+    } catch (e) {
+      print("Error initializing weather data: $e");
+      // Handle the error appropriately, e.g., show an error message to the user
+    }
+  }
+
+  void refreshPage() {
+    setState(() {
+      _weather = null;
+      _forecast = null;
+      _aqi = null;
+      wf = null;
+      airquality = null;
+      _key = UniqueKey();
+      _initializeWeather();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: app_ui(),
+      body: Stack(
+        children: [
+          app_ui(),
+          Positioned(
+            top: MediaQuery.of(context).size.height *
+                0.05, // Adjust as needed for spacing
+            right: MediaQuery.of(context).size.width *
+                0.04, // Adjust as needed for spacing
+            child: FloatingActionButton(
+              onPressed: refreshPage,
+              child: Icon(
+                Icons.refresh,
+                color: Colors.black,
+              ),
+              elevation: 0,
+              backgroundColor: Color.fromRGBO(255, 255, 255, 0.5),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -97,22 +133,28 @@ class HomeCityState extends State<HomeCity> {
     var direc;
     if (angle == null) {
       direc = 'Unknown';
-    } else if (angle >= 337.5 && angle <= 22.5) {
-      direc = 'N';
-    } else if (angle >= 22.5 && angle <= 67.5) {
-      direc = 'NE';
-    } else if (angle >= 67.5 && angle <= 112.5) {
-      direc = 'E';
-    } else if (angle >= 112.5 && angle <= 157.5) {
-      direc = 'SE';
-    } else if (angle >= 157.5 && angle <= 202.5) {
-      direc = 'S';
-    } else if (angle >= 202.5 && angle <= 247.5) {
-      direc = 'SW';
-    } else if (angle >= 247.5 && angle <= 292.5) {
-      direc = 'W';
-    } else if (angle >= 292.5 && angle <= 337.5) {
-      direc = 'NW';
+    } else if (angle != null) {
+      if (angle >= 337.5 || angle <= 22.5) {
+        direc = 'N';
+      } else if (angle > 22.5 && angle <= 67.5) {
+        direc = 'NE';
+      } else if (angle > 67.5 && angle <= 112.5) {
+        direc = 'E';
+      } else if (angle > 112.5 && angle <= 157.5) {
+        direc = 'SE';
+      } else if (angle > 157.5 && angle <= 202.5) {
+        direc = 'S';
+      } else if (angle > 202.5 && angle <= 247.5) {
+        direc = 'SW';
+      } else if (angle > 247.5 && angle <= 292.5) {
+        direc = 'W';
+      } else if (angle > 292.5 && angle < 337.5) {
+        direc = 'NW';
+      } else {
+        direc = 'Unknown'; // Handle cases outside expected ranges
+      }
+    } else {
+      direc = 'Unknown';
     }
     return direc;
   }
@@ -196,7 +238,7 @@ class HomeCityState extends State<HomeCity> {
       return Container(
         width: screenwidth * 0.8,
         height: screenheight * 0.7,
-        color: Colors.black, // Set the background color to black
+        color: Colors.black,
         padding: EdgeInsets.all(16.0),
         child: Center(
           child: Text(
@@ -226,9 +268,8 @@ class HomeCityState extends State<HomeCity> {
                   left: screenwidth * 0.04,
                   right: screenwidth * 0.04),
               padding: EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                  //color: Color.fromRGBO(0, 0, 0, 0.6),
-                  borderRadius: BorderRadius.circular(25.0)),
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(25.0)),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -261,11 +302,10 @@ class HomeCityState extends State<HomeCity> {
                                 fontSize: screenheight * 0.02,
                                 color: Colors.white)),
                         Text(
-                          '${_weather?.tempMax?.celsius?.toStringAsFixed(1) ?? ""}°C / ${_weather?.tempMin?.celsius?.toStringAsFixed(1) ?? ""}°C',
-                          style: TextStyle(
-                              fontSize: screenheight * 0.02,
-                              color: Colors.white),
-                        ),
+                            '${_weather?.tempMax?.celsius?.toStringAsFixed(1) ?? ""}°C / ${_weather?.tempMin?.celsius?.toStringAsFixed(1) ?? ""}°C',
+                            style: TextStyle(
+                                fontSize: screenheight * 0.02,
+                                color: Colors.white)),
                       ],
                     ),
                     Align(
@@ -293,7 +333,6 @@ class HomeCityState extends State<HomeCity> {
                     color: Color.fromRGBO(255, 255, 255, 0.25),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Column(
-                  //crossAxisAlignment: CrossAxisAlignment.baseline,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
