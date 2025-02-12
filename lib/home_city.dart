@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
@@ -5,6 +6,8 @@ import 'package:weather/weather.dart';
 import 'package:air_quality_waqi/air_quality_waqi.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
+import 'package:weather_app/main.dart';
+import 'package:http/http.dart' as http; // Import http
 
 Weather? _weather;
 List<Weather>? _forecast;
@@ -21,11 +24,72 @@ class HomeCityState extends State<HomeCity> {
   WeatherFactory? wf;
   AirQualityWaqi? airquality;
   Key _key = UniqueKey();
+  TextEditingController _cityController = TextEditingController();
+  List<dynamic> _searchResults = [];
+  bool _isLoading = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
     _initializeWeather();
+
+    // Listen for changes in the TextField
+    _cityController.addListener(_onCityTextChanged);
+  }
+
+  @override
+  void dispose() {
+    _cityController.removeListener(_onCityTextChanged);
+    _cityController.dispose();
+    super.dispose();
+  }
+
+  void _onCityTextChanged() {
+    // Debounce the search to avoid making too many API calls while typing
+    Future.delayed(Duration(milliseconds: 500), () {
+      if (_cityController.text.isNotEmpty &&
+          mounted &&
+          _cityController.text == _lastText) {
+        _searchCities(_cityController.text);
+      }
+    });
+
+    _lastText = _cityController.text;
+  }
+
+  String _lastText = "";
+
+  Future<void> _searchCities(String cityName) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    final String apiKey = dotenv.env['WEATHER_APPLCATION_API_KEY']!;
+    final String url =
+        'http://api.openweathermap.org/geo/1.0/direct?q=$cityName&limit=5&appid=$apiKey';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _searchResults = json.decode(response.body);
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'Error: ${response.statusCode} - ${response.body}';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An error occurred: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   Future<Map<String, double>> getLocation() async {
@@ -44,6 +108,11 @@ class HomeCityState extends State<HomeCity> {
     double latitude = location['latitude']!;
     double longitude = location['longitude']!;
 
+    _fetchWeatherData(latitude, longitude);
+  }
+
+  // Method to fetch weather data based on coordinates
+  Future<void> _fetchWeatherData(double latitude, double longitude) async {
     wf = WeatherFactory(dotenv.env['WEATHER_APPLCATION_API_KEY']!);
     try {
       Weather weather = await wf!.currentWeatherByLocation(latitude, longitude);
@@ -65,7 +134,61 @@ class HomeCityState extends State<HomeCity> {
       });
     } catch (e) {
       print("Error initializing weather data: $e");
-      // Handle the error appropriately, e.g., show an error message to the user
+    }
+  }
+
+  // Method to fetch weather data based on city name
+  Future<void> _fetchWeatherDataByCity(String cityName) async {
+    try {
+      // Use Geocoding API to get coordinates
+      Map<String, double>? coordinates =
+          await _getCoordinatesFromCityName(cityName);
+
+      if (coordinates != null) {
+        double latitude = coordinates['latitude']!;
+        double longitude = coordinates['longitude']!;
+
+        // Fetch weather data
+        _fetchWeatherData(latitude, longitude);
+      } else {
+        setState(() {
+          _errorMessage = 'City not found.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error fetching weather data: $e';
+      });
+    }
+  }
+
+  // Helper function to get coordinates from city name using OpenWeather Geocoding API
+  Future<Map<String, double>?> _getCoordinatesFromCityName(
+      String cityName) async {
+    final String apiKey = dotenv.env['WEATHER_APPLCATION_API_KEY']!;
+    final String geocodingUrl =
+        'http://api.openweathermap.org/geo/1.0/direct?q=$cityName&limit=1&appid=$apiKey';
+
+    try {
+      final response = await http.get(Uri.parse(geocodingUrl));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> results = json.decode(response.body);
+        if (results.isNotEmpty) {
+          return {
+            'latitude': results[0]['lat'],
+            'longitude': results[0]['lon'],
+          };
+        } else {
+          return null; // City not found
+        }
+      } else {
+        print('Geocoding API error: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching coordinates: $e');
+      return null;
     }
   }
 
@@ -88,10 +211,69 @@ class HomeCityState extends State<HomeCity> {
         children: [
           app_ui(),
           Positioned(
-            top: MediaQuery.of(context).size.height *
-                0.05, // Adjust as needed for spacing
-            right: MediaQuery.of(context).size.width *
-                0.04, // Adjust as needed for spacing
+            width: MediaQuery.of(context).size.width * 0.35,
+            top: MediaQuery.of(context).size.height * 0.05,
+            right: MediaQuery.of(context).size.width * 0.23,
+            child: Column(
+              children: [
+                TextField(
+                  controller: _cityController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Color.fromRGBO(255, 255, 255, 0.5),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                        borderSide: BorderSide.none),
+                    hintText: 'Search city..',
+                    // suffixIcon: IconButton(  // Removed suffixIcon IconButton
+                    //   icon: Icon(Icons.search),
+                    //   onPressed: () {
+                    //     _fetchWeatherDataByCity(_cityController.text);
+                    //   },
+                    // ),
+                  ),
+                ),
+                if (_isLoading)
+                  CircularProgressIndicator()
+                else if (_errorMessage.isNotEmpty)
+                  Text(_errorMessage, style: TextStyle(color: Colors.red))
+                else if (_searchResults.isNotEmpty)
+                  Container(
+                    height: 200, // Adjust height as needed
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(255, 255, 255, 0.7),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: ListView.builder(
+                      itemCount: _searchResults.length,
+                      itemBuilder: (context, index) {
+                        final city = _searchResults[index];
+                        return ListTile(
+                          title: Text(city['name']),
+                          subtitle: Text(
+                              '${city['state'] ?? ''}, ${city['country']}'),
+                          onTap: () {
+                            // Fetch weather data for the selected city
+                            _fetchWeatherDataByCity(city['name']);
+                            // Clear search results and close dropdown
+                            setState(() {
+                              _searchResults = [];
+                              _cityController.text = city['name'];
+                            });
+                            FocusScope.of(context)
+                                .unfocus(); // Remove focus from TextField
+                          },
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.05,
+            right: MediaQuery.of(context).size.width * 0.04,
             child: FloatingActionButton(
               onPressed: refreshPage,
               child: Icon(
@@ -192,6 +374,17 @@ class HomeCityState extends State<HomeCity> {
                   style: TextStyle(
                       color: Colors.white, fontSize: screenheight * 0.025),
                 ),
+                Align(
+                  child: Container(
+                    height: screenheight * 0.04,
+                    width: screenwidth * 0.1,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                      image: NetworkImage(
+                          "https://openweathermap.org/img/wn/${_weather?.weatherIcon}@2x.png"),
+                    )),
+                  ),
+                ),
                 Text(
                   '${forecast.weatherDescription}',
                   style: TextStyle(
@@ -236,8 +429,9 @@ class HomeCityState extends State<HomeCity> {
     double screenheight = MediaQuery.of(context).size.height;
     if (_weather == null) {
       return Container(
-        width: screenwidth * 0.8,
-        height: screenheight * 0.7,
+        alignment: Alignment.center,
+        width: screenwidth,
+        height: screenheight,
         color: Colors.black,
         padding: EdgeInsets.all(16.0),
         child: Center(
@@ -302,7 +496,7 @@ class HomeCityState extends State<HomeCity> {
                                 fontSize: screenheight * 0.02,
                                 color: Colors.white)),
                         Text(
-                            '${_weather?.tempMax?.celsius?.toStringAsFixed(1) ?? ""}°C / ${_weather?.tempMin?.celsius?.toStringAsFixed(1) ?? ""}°C',
+                            '${_weather?.tempMax?.celsius?.toStringAsFixed(1) ?? ""}°C , ${_weather?.tempMin?.celsius?.toStringAsFixed(1) ?? ""}°C',
                             style: TextStyle(
                                 fontSize: screenheight * 0.02,
                                 color: Colors.white)),
