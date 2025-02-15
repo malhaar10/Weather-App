@@ -6,7 +6,7 @@ import 'package:weather/weather.dart';
 import 'package:air_quality_waqi/air_quality_waqi.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
-import 'package:http/http.dart' as http; // Import http
+import 'package:http/http.dart' as http;
 
 Weather? _weather;
 List<Weather>? _forecast;
@@ -27,7 +27,9 @@ class HomeCityState extends State<HomeCity> {
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
   String _errorMessage = '';
-  var time = _weather?.date?.hour;
+  String _lastText = "";
+  bool isDay = false;
+  String? iconString;
 
   @override
   void initState() {
@@ -55,8 +57,6 @@ class HomeCityState extends State<HomeCity> {
 
     _lastText = _cityController.text;
   }
-
-  String _lastText = "";
 
   Future<void> _searchCities(String cityName) async {
     setState(() {
@@ -143,7 +143,7 @@ class HomeCityState extends State<HomeCity> {
         double latitude = coordinates['latitude']!;
         double longitude = coordinates['longitude']!;
 
-        _fetchWeatherData(latitude, longitude);
+        await _fetchWeatherData(latitude, longitude);
       } else {
         setState(() {
           _errorMessage = 'City not found.';
@@ -197,7 +197,6 @@ class HomeCityState extends State<HomeCity> {
     });
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -392,6 +391,12 @@ class HomeCityState extends State<HomeCity> {
   }
 
   WrapperScene? getScene() {
+    String? iconString = _weather?.weatherIcon;
+    if (iconString != null) {
+      if (iconString!.contains("d")) {
+        isDay = true;
+      }
+    }
     var wdes = _weather?.weatherConditionCode;
     WrapperScene? scene;
     if (wdes != null) {
@@ -816,7 +821,7 @@ class HomeCityState extends State<HomeCity> {
           children: [],
         );
       } else if (wdes == 800) {
-        if (_weather!.date!.hour > 18) {
+        if (isDay == false) {
           scene = WrapperScene(
             sizeCanvas: Size(350, 540),
             isLeftCornerGradient: false,
@@ -842,7 +847,7 @@ class HomeCityState extends State<HomeCity> {
           scene = WrapperScene.weather(scene: WeatherScene.scorchingSun);
         }
       } else if (wdes >= 801 && wdes <= 804) {
-        if (_weather!.date!.hour > 18) {
+        if (isDay == false) {
           scene = WrapperScene(
             sizeCanvas: Size(350, 540),
             isLeftCornerGradient: false,
@@ -1031,6 +1036,11 @@ class HomeCityState extends State<HomeCity> {
                             style: TextStyle(
                                 fontSize: screenheight * 0.02,
                                 color: Colors.white)),
+                        // Text(
+                        //     '${_weather?.date != null ? DateFormat('HH:mm:s').format(_weather!.date!) : ""}',
+                        //     style: TextStyle(
+                        //         fontSize: screenheight * 0.02,
+                        //         color: Colors.white)),
                       ],
                     ),
                     Align(
@@ -1227,16 +1237,10 @@ class HomeCityState extends State<HomeCity> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(
-                          'Condition',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenheight * 0.015),
-                        ),
-                        Text('${_weather?.date?.hour}',
+                        Text('${_aqi?.place}',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: screenheight * 0.027))
+                                fontSize: screenheight * 0.009))
                       ],
                     )),
               ],
