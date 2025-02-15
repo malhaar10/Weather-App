@@ -14,6 +14,14 @@ class WeatherApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Montserrat',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(fontWeight: FontWeight.w800),
+          bodyMedium: TextStyle(fontWeight: FontWeight.w600),
+          titleLarge: TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
       home: HomeCity(),
     );
   }

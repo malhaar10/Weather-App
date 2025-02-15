@@ -200,6 +200,7 @@ class HomeCityState extends State<HomeCity> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
+        alignment: Alignment.center,
         children: [
           app_ui(),
           Positioned(
@@ -216,13 +217,7 @@ class HomeCityState extends State<HomeCity> {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15.0)),
                         borderSide: BorderSide.none),
-                    hintText: 'Search city..',
-                    // suffixIcon: IconButton(  // Removed suffixIcon IconButton
-                    //   icon: Icon(Icons.search),
-                    //   onPressed: () {
-                    //     _fetchWeatherDataByCity(_cityController.text);
-                    //   },
-                    // ),
+                    hintText: 'Search city',
                   ),
                 ),
                 if (_isLoading)
@@ -1240,7 +1235,7 @@ class HomeCityState extends State<HomeCity> {
                         Text('${_aqi?.place}',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: screenheight * 0.009))
+                                fontSize: screenheight * 0.01))
                       ],
                     )),
               ],
