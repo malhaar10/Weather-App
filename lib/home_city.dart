@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather/weather.dart';
@@ -28,8 +29,8 @@ class HomeCityState extends State<HomeCity> {
   bool _isLoading = false;
   String _errorMessage = '';
   String _lastText = "";
-  bool isDay = false;
   String? iconString;
+  String ow_link = 'https://openweathermap.org/';
 
   @override
   void initState() {
@@ -349,21 +350,25 @@ class HomeCityState extends State<HomeCity> {
         children: [
           ...dailyForecasts.map((forecast) {
             return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
-                  DateFormat('dd').format(forecast.date!),
-                  style: TextStyle(
-                      color: Colors.white, fontSize: screenheight * 0.025),
-                ),
-                Text(
-                  '${forecast.temperature?.celsius?.toStringAsFixed(1)}°C',
-                  style: TextStyle(
-                      color: Colors.white, fontSize: screenheight * 0.025),
-                ),
+                SizedBox(
+                    width: screenwidth * 0.1,
+                    child: Text(
+                      DateFormat('dd').format(forecast.date!),
+                      style: TextStyle(
+                          color: Colors.white, fontSize: screenheight * 0.025),
+                    )),
+                SizedBox(
+                    width: screenwidth * 0.15,
+                    child: Text(
+                      '${forecast.temperature?.celsius?.toStringAsFixed(1)}°C',
+                      style: TextStyle(
+                          color: Colors.white, fontSize: screenheight * 0.025),
+                    )),
                 Align(
                   child: Container(
-                    height: screenheight * 0.04,
+                    height: screenheight * 0.05,
                     width: screenwidth * 0.1,
                     decoration: BoxDecoration(
                         image: DecorationImage(
@@ -372,11 +377,18 @@ class HomeCityState extends State<HomeCity> {
                     )),
                   ),
                 ),
-                Text(
-                  '${forecast.weatherDescription}',
-                  style: TextStyle(
-                      color: Colors.white, fontSize: screenheight * 0.025),
-                ),
+                SizedBox(width: screenwidth * 0.03),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: screenwidth * 0.4,
+                    child: Text(
+                      '${forecast.weatherDescription}',
+                      style: TextStyle(
+                          color: Colors.white, fontSize: screenheight * 0.025),
+                    ),
+                  ),
+                )
               ],
             );
           }).toList(),
@@ -385,578 +397,592 @@ class HomeCityState extends State<HomeCity> {
     );
   }
 
-  WrapperScene? getScene() {
-    String? iconString = _weather?.weatherIcon;
-    if (iconString != null) {
-      if (iconString!.contains("d")) {
-        isDay = true;
-      }
-    }
-    var wdes = _weather?.weatherConditionCode;
-    WrapperScene? scene;
-    if (wdes != null) {
-      if (wdes >= 200 && wdes <= 232) {
-        scene = WrapperScene.weather(scene: WeatherScene.stormy);
-      } else if (wdes >= 300 && wdes <= 311) {
-        //rain
-        scene = WrapperScene(
-          sizeCanvas: Size(350, 540),
-          isLeftCornerGradient: false,
-          colors: [
-            Color.fromARGB(0xb6, 0x45, 0x5a, 0x64),
-          ],
-          children: [
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 10,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 120,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 216,
-                  color: Color.fromARGB(0xaa, 0xff, 0xff, 0xff),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 24,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 3,
-                  slideY: 1,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 250,
-                  color: Color.fromARGB(0xe9, 0xff, 0xff, 0xff),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 70,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 11,
-                  slideY: 5,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 5,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 63,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-          ],
-        );
-      } else if (wdes >= 312 && wdes <= 321) {
-        scene = WrapperScene(
-          sizeCanvas: Size(350, 540),
-          isLeftCornerGradient: false,
-          colors: [
-            Color.fromARGB(0xb6, 0x45, 0x5a, 0x64),
-          ],
-          children: [
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 10,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 120,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 13,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 85,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 216,
-                  color: Color.fromARGB(0xaa, 0xff, 0xff, 0xff),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 24,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 11,
-                  slideY: 5,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 250,
-                  color: Color.fromARGB(0xe9, 0xff, 0xff, 0xff),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 70,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 11,
-                  slideY: 5,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 10,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 120,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-          ],
-        );
-      } else if (wdes >= 500 && wdes <= 501) {
-        scene = WrapperScene(
-          sizeCanvas: Size(350, 540),
-          isLeftCornerGradient: false,
-          colors: [
-            Color(0xb6455a64),
-          ],
-          children: [
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 10,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(153, 120, 144, 156),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 120,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 216,
-                  color: Color.fromARGB(170, 255, 255, 255),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 24,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 3,
-                  slideY: 1,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 250,
-                  color: Color.fromARGB(
-                    233,
-                    255,
-                    255,
-                    255,
-                  ),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 70,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 11,
-                  slideY: 5,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 5,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(153, 120, 144, 156),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 63,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-          ],
-        );
-      } else if (wdes >= 502 && wdes <= 531) {
-        scene = WrapperScene(
-          sizeCanvas: Size(350, 540),
-          isLeftCornerGradient: false,
-          colors: [
-            Color.fromARGB(0xb6, 0x45, 0x5a, 0x64),
-          ],
-          children: [
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 10,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 120,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 13,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 85,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 216,
-                  color: Color.fromARGB(0xaa, 0xff, 0xff, 0xff),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 24,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 11,
-                  slideY: 5,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            CloudWidget(
-              cloudConfig: CloudConfig(
-                  size: 250,
-                  color: Color.fromARGB(0xe9, 0xff, 0xff, 0xff),
-                  icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                  widgetCloud: null,
-                  x: 70,
-                  y: 5,
-                  scaleBegin: 1,
-                  scaleEnd: 1.1,
-                  scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  slideX: 11,
-                  slideY: 5,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-            ),
-            RainWidget(
-              rainConfig: RainConfig(
-                  count: 10,
-                  lengthDrop: 12,
-                  widthDrop: 4,
-                  color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
-                  isRoundedEndsDrop: true,
-                  widgetRainDrop: null,
-                  fallRangeMinDurMill: 500,
-                  fallRangeMaxDurMill: 1500,
-                  areaXStart: 120,
-                  areaXEnd: 190,
-                  areaYStart: 215,
-                  areaYEnd: 540,
-                  slideX: 2,
-                  slideY: 0,
-                  slideDurMill: 2000,
-                  slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                  fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
-                  fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
-            ),
-          ],
-        );
-      } else if (wdes >= 600 && wdes <= 602) {
-        scene = WrapperScene.weather(scene: WeatherScene.snowfall);
-      } else if (wdes >= 611 && wdes <= 622) {
-        scene = WrapperScene.weather(scene: WeatherScene.showerSleet);
-      } else if (wdes >= 701 && wdes <= 731) {
-        scene = WrapperScene(
-          sizeCanvas: Size(350, 540),
-          isLeftCornerGradient: false,
-          colors: [
-            Color(0x8a2196f3),
-            Color(0x63263238),
-          ],
-          children: [],
-        );
-      } else if (wdes == 741) {
-        scene = WrapperScene(
-          sizeCanvas: Size(350, 540),
-          isLeftCornerGradient: false,
-          colors: [
-            Color(0x8a2196f3),
-            Color(0xcbb0bec5),
-          ],
-          children: [],
-        );
-      } else if (wdes >= 751 && wdes <= 781) {
-        scene = WrapperScene(
-          sizeCanvas: Size(350, 540),
-          isLeftCornerGradient: false,
-          colors: [
-            Color(0x982196f3),
-            Color(0xff795548),
-          ],
-          children: [],
-        );
-      } else if (wdes == 800) {
-        if (isDay == false) {
-          scene = WrapperScene(
-            sizeCanvas: Size(350, 540),
-            isLeftCornerGradient: false,
-            colors: [
-              Color.fromARGB(0xcb, 0x0d, 0x47, 0xa1),
-            ],
-            children: [
-              SunWidget(
-                sunConfig: SunConfig(
-                    width: 1042,
-                    blurSigma: 13,
-                    blurStyle: BlurStyle.solid,
-                    isLeftLocation: true,
-                    coreColor: Color.fromARGB(0xd4, 0xff, 0xf3, 0xe0),
-                    midColor: Color.fromARGB(0x00, 0xff, 0xee, 0x58),
-                    outColor: Color.fromARGB(0x00, 0xff, 0xa7, 0x26),
-                    animMidMill: 1500,
-                    animOutMill: 1500),
-              ),
-            ],
-          );
-        } else {
-          scene = WrapperScene.weather(scene: WeatherScene.scorchingSun);
-        }
-      } else if (wdes >= 801 && wdes <= 804) {
-        if (isDay == false) {
-          scene = WrapperScene(
-            sizeCanvas: Size(350, 540),
-            isLeftCornerGradient: false,
-            colors: [
-              Color.fromARGB(0xff, 0x1a, 0x23, 0x7e),
-            ],
-            children: [
-              CloudWidget(
-                cloudConfig: CloudConfig(
-                    size: 176,
-                    color: Color.fromARGB(0xf8, 0xff, 0xff, 0xff),
-                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                    widgetCloud: null,
-                    x: 103,
-                    y: 59,
-                    scaleBegin: 1,
-                    scaleEnd: 1.1,
-                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                    slideX: 11,
-                    slideY: 5,
-                    slideDurMill: 2000,
-                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-              ),
-              CloudWidget(
-                cloudConfig: CloudConfig(
-                    size: 250,
-                    color: Color.fromARGB(0xe3, 0xff, 0xff, 0xff),
-                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                    widgetCloud: null,
-                    x: 0,
-                    y: -31,
-                    scaleBegin: 1,
-                    scaleEnd: 1.1,
-                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                    slideX: 11,
-                    slideY: 5,
-                    slideDurMill: 2000,
-                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-              ),
-              SunWidget(
-                sunConfig: SunConfig(
-                    width: 588,
-                    blurSigma: 6,
-                    blurStyle: BlurStyle.solid,
-                    isLeftLocation: true,
-                    coreColor: Color.fromARGB(0xae, 0xff, 0xf3, 0xe0),
-                    midColor: Color.fromARGB(0x00, 0xff, 0xee, 0x58),
-                    outColor: Color.fromARGB(0x00, 0xff, 0xa7, 0x26),
-                    animMidMill: 462,
-                    animOutMill: 1794),
-              ),
-            ],
-          );
-        } else {
-          scene = WrapperScene(
-            sizeCanvas: Size(350, 540),
-            isLeftCornerGradient: false,
-            colors: [
-              Color.fromARGB(0xe1, 0x21, 0x96, 0xf3),
-            ],
-            children: [
-              SunWidget(
-                sunConfig: SunConfig(
-                    width: -1566,
-                    blurSigma: 12,
-                    blurStyle: BlurStyle.solid,
-                    isLeftLocation: true,
-                    coreColor: Color.fromARGB(0xff, 0xff, 0x98, 0x00),
-                    midColor: Color.fromARGB(0x35, 0xff, 0xee, 0x58),
-                    outColor: Color.fromARGB(0x00, 0xff, 0xa7, 0x26),
-                    animMidMill: 202,
-                    animOutMill: 901),
-              ),
-              CloudWidget(
-                cloudConfig: CloudConfig(
-                    size: 250,
-                    color: Color.fromARGB(0xe3, 0xff, 0xff, 0xff),
-                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                    widgetCloud: null,
-                    x: 0,
-                    y: -31,
-                    scaleBegin: 1,
-                    scaleEnd: 1.1,
-                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                    slideX: 11,
-                    slideY: 5,
-                    slideDurMill: 2000,
-                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-              ),
-              CloudWidget(
-                cloudConfig: CloudConfig(
-                    size: 176,
-                    color: Color.fromARGB(0xf8, 0xff, 0xff, 0xff),
-                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
-                    widgetCloud: null,
-                    x: 103,
-                    y: 59,
-                    scaleBegin: 1,
-                    scaleEnd: 1.1,
-                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
-                    slideX: 11,
-                    slideY: 5,
-                    slideDurMill: 2000,
-                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
-              ),
-            ],
-          );
-        }
-      }
-    }
-    return scene;
-  }
-
   Widget app_ui() {
+    bool isDay = false;
+    WrapperScene? getScene() {
+      String? iconString = _weather?.weatherIcon;
+      if (iconString != null) {
+        if (iconString.endsWith('d')) {
+          isDay = true;
+        }
+      }
+      var wdes = _weather?.weatherConditionCode;
+      WrapperScene? scene;
+      if (wdes != null) {
+        if (wdes >= 200 && wdes <= 232) {
+          //storm
+          scene = WrapperScene.weather(scene: WeatherScene.stormy);
+        } else if (wdes >= 300 && wdes <= 311) {
+          //rain
+          scene = WrapperScene(
+            sizeCanvas: Size(350, 540),
+            isLeftCornerGradient: false,
+            colors: [
+              Color.fromARGB(0xb6, 0x45, 0x5a, 0x64),
+            ],
+            children: [
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 10,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 120,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 216,
+                    color: Color.fromARGB(0xaa, 0xff, 0xff, 0xff),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 24,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 3,
+                    slideY: 1,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 250,
+                    color: Color.fromARGB(0xe9, 0xff, 0xff, 0xff),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 70,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 11,
+                    slideY: 5,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 5,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 63,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+            ],
+          );
+        } else if (wdes >= 312 && wdes <= 321) {
+          //heavy rain
+          scene = WrapperScene(
+            sizeCanvas: Size(350, 540),
+            isLeftCornerGradient: false,
+            colors: [
+              Color.fromARGB(0xb6, 0x45, 0x5a, 0x64),
+            ],
+            children: [
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 10,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 120,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 13,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 85,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 216,
+                    color: Color.fromARGB(0xaa, 0xff, 0xff, 0xff),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 24,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 11,
+                    slideY: 5,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 250,
+                    color: Color.fromARGB(0xe9, 0xff, 0xff, 0xff),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 70,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 11,
+                    slideY: 5,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 10,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 120,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+            ],
+          );
+        } else if (wdes >= 500 && wdes <= 501) {
+          // rain
+          scene = WrapperScene(
+            sizeCanvas: Size(350, 540),
+            isLeftCornerGradient: false,
+            colors: [
+              Color(0xb6455a64),
+            ],
+            children: [
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 10,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(153, 120, 144, 156),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 120,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 216,
+                    color: Color.fromARGB(170, 255, 255, 255),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 24,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 3,
+                    slideY: 1,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 250,
+                    color: Color.fromARGB(
+                      233,
+                      255,
+                      255,
+                      255,
+                    ),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 70,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 11,
+                    slideY: 5,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 5,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(153, 120, 144, 156),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 63,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+            ],
+          );
+        } else if (wdes >= 502 && wdes <= 531) {
+          //heavy rain
+          scene = WrapperScene(
+            sizeCanvas: Size(350, 540),
+            isLeftCornerGradient: false,
+            colors: [
+              Color.fromARGB(0xb6, 0x45, 0x5a, 0x64),
+            ],
+            children: [
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 10,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 120,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 13,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 85,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 216,
+                    color: Color.fromARGB(0xaa, 0xff, 0xff, 0xff),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 24,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 11,
+                    slideY: 5,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              CloudWidget(
+                cloudConfig: CloudConfig(
+                    size: 250,
+                    color: Color.fromARGB(0xe9, 0xff, 0xff, 0xff),
+                    icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                    widgetCloud: null,
+                    x: 70,
+                    y: 5,
+                    scaleBegin: 1,
+                    scaleEnd: 1.1,
+                    scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    slideX: 11,
+                    slideY: 5,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+              ),
+              RainWidget(
+                rainConfig: RainConfig(
+                    count: 10,
+                    lengthDrop: 12,
+                    widthDrop: 4,
+                    color: Color.fromARGB(0x99, 0x78, 0x90, 0x9c),
+                    isRoundedEndsDrop: true,
+                    widgetRainDrop: null,
+                    fallRangeMinDurMill: 500,
+                    fallRangeMaxDurMill: 1500,
+                    areaXStart: 120,
+                    areaXEnd: 190,
+                    areaYStart: 215,
+                    areaYEnd: 540,
+                    slideX: 2,
+                    slideY: 0,
+                    slideDurMill: 2000,
+                    slideCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                    fallCurve: Cubic(0.55, 0.09, 0.68, 0.53),
+                    fadeCurve: Cubic(0.95, 0.05, 0.80, 0.04)),
+              ),
+            ],
+          );
+        } else if (wdes >= 600 && wdes <= 602) {
+          //snowfall
+          scene = WrapperScene.weather(scene: WeatherScene.snowfall);
+        } else if (wdes >= 611 && wdes <= 622) {
+          //sleet
+          scene = WrapperScene.weather(scene: WeatherScene.showerSleet);
+        } else if (wdes >= 701 && wdes <= 731) {
+          //fog
+          scene = WrapperScene(
+            sizeCanvas: Size(350, 540),
+            isLeftCornerGradient: false,
+            colors: [
+              Color(0x8a2196f3),
+              Color(0x63263238),
+            ],
+            children: [],
+          );
+        } else if (wdes == 741) {
+          //fog
+          scene = WrapperScene(
+            sizeCanvas: Size(350, 540),
+            isLeftCornerGradient: false,
+            colors: [
+              Color(0x8a2196f3),
+              Color(0xcbb0bec5),
+            ],
+            children: [],
+          );
+        } else if (wdes >= 751 && wdes <= 781) {
+          //smoke, dust
+          scene = WrapperScene(
+            sizeCanvas: Size(350, 540),
+            isLeftCornerGradient: false,
+            colors: [
+              Color(0x982196f3),
+              Color(0xff795548),
+            ],
+            children: [],
+          );
+        } else if (wdes == 800) {
+          if (isDay == false) {
+            //clear night
+            scene = WrapperScene(
+              sizeCanvas: Size(350, 540),
+              isLeftCornerGradient: false,
+              colors: [
+                Color.fromARGB(0xcb, 0x0d, 0x47, 0xa1),
+              ],
+              children: [
+                SunWidget(
+                  sunConfig: SunConfig(
+                      width: 1042,
+                      blurSigma: 13,
+                      blurStyle: BlurStyle.solid,
+                      isLeftLocation: true,
+                      coreColor: Color.fromARGB(0xd4, 0xff, 0xf3, 0xe0),
+                      midColor: Color.fromARGB(0x00, 0xff, 0xee, 0x58),
+                      outColor: Color.fromARGB(0x00, 0xff, 0xa7, 0x26),
+                      animMidMill: 1500,
+                      animOutMill: 1500),
+                ),
+              ],
+            );
+          } else {
+            //clear day
+            scene = WrapperScene.weather(scene: WeatherScene.scorchingSun);
+          }
+        } else if (wdes >= 801 && wdes <= 804) {
+          if (isDay == false) {
+            //cloudy night
+            scene = WrapperScene(
+              sizeCanvas: Size(350, 540),
+              isLeftCornerGradient: false,
+              colors: [
+                Color.fromARGB(0xff, 0x1a, 0x23, 0x7e),
+              ],
+              children: [
+                CloudWidget(
+                  cloudConfig: CloudConfig(
+                      size: 176,
+                      color: Color.fromARGB(0xf8, 0xff, 0xff, 0xff),
+                      icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                      widgetCloud: null,
+                      x: 103,
+                      y: 59,
+                      scaleBegin: 1,
+                      scaleEnd: 1.1,
+                      scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                      slideX: 11,
+                      slideY: 5,
+                      slideDurMill: 2000,
+                      slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+                ),
+                CloudWidget(
+                  cloudConfig: CloudConfig(
+                      size: 250,
+                      color: Color.fromARGB(0xe3, 0xff, 0xff, 0xff),
+                      icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                      widgetCloud: null,
+                      x: 0,
+                      y: -31,
+                      scaleBegin: 1,
+                      scaleEnd: 1.1,
+                      scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                      slideX: 11,
+                      slideY: 5,
+                      slideDurMill: 2000,
+                      slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+                ),
+                SunWidget(
+                  sunConfig: SunConfig(
+                      width: 588,
+                      blurSigma: 6,
+                      blurStyle: BlurStyle.solid,
+                      isLeftLocation: true,
+                      coreColor: Color.fromARGB(0xae, 0xff, 0xf3, 0xe0),
+                      midColor: Color.fromARGB(0x00, 0xff, 0xee, 0x58),
+                      outColor: Color.fromARGB(0x00, 0xff, 0xa7, 0x26),
+                      animMidMill: 462,
+                      animOutMill: 1794),
+                ),
+              ],
+            );
+          } else {
+            //cloudy day
+            scene = WrapperScene(
+              sizeCanvas: Size(350, 540),
+              isLeftCornerGradient: false,
+              colors: [
+                Color.fromARGB(0xe1, 0x21, 0x96, 0xf3),
+              ],
+              children: [
+                SunWidget(
+                  sunConfig: SunConfig(
+                      width: -1566,
+                      blurSigma: 12,
+                      blurStyle: BlurStyle.solid,
+                      isLeftLocation: true,
+                      coreColor: Color.fromARGB(0xff, 0xff, 0x98, 0x00),
+                      midColor: Color.fromARGB(0x35, 0xff, 0xee, 0x58),
+                      outColor: Color.fromARGB(0x00, 0xff, 0xa7, 0x26),
+                      animMidMill: 202,
+                      animOutMill: 901),
+                ),
+                CloudWidget(
+                  cloudConfig: CloudConfig(
+                      size: 250,
+                      color: Color.fromARGB(0xe3, 0xff, 0xff, 0xff),
+                      icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                      widgetCloud: null,
+                      x: 0,
+                      y: -31,
+                      scaleBegin: 1,
+                      scaleEnd: 1.1,
+                      scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                      slideX: 11,
+                      slideY: 5,
+                      slideDurMill: 2000,
+                      slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+                ),
+                CloudWidget(
+                  cloudConfig: CloudConfig(
+                      size: 176,
+                      color: Color.fromARGB(0xf8, 0xff, 0xff, 0xff),
+                      icon: IconData(63056, fontFamily: 'MaterialIcons'),
+                      widgetCloud: null,
+                      x: 103,
+                      y: 59,
+                      scaleBegin: 1,
+                      scaleEnd: 1.1,
+                      scaleCurve: Cubic(0.40, 0.00, 0.20, 1.00),
+                      slideX: 11,
+                      slideY: 5,
+                      slideDurMill: 2000,
+                      slideCurve: Cubic(0.40, 0.00, 0.20, 1.00)),
+                ),
+              ],
+            );
+          }
+        }
+      }
+      return scene;
+    }
+
     WrapperScene? sCene = getScene();
     var get_aqi = get_aqi_cond();
     var direc = getDirection();
@@ -993,8 +1019,9 @@ class HomeCityState extends State<HomeCity> {
                   left: screenwidth * 0.04,
                   right: screenwidth * 0.04),
               padding: EdgeInsets.all(20.0),
-              decoration:
-                  BoxDecoration(borderRadius: BorderRadius.circular(25.0)),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25.0),
+                  color: Color.fromRGBO(43, 40, 40, 0.247)),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -1031,11 +1058,11 @@ class HomeCityState extends State<HomeCity> {
                             style: TextStyle(
                                 fontSize: screenheight * 0.02,
                                 color: Colors.white)),
-                        // Text(
-                        //     '${_weather?.date != null ? DateFormat('HH:mm:s').format(_weather!.date!) : ""}',
-                        //     style: TextStyle(
-                        //         fontSize: screenheight * 0.02,
-                        //         color: Colors.white)),
+                        Text(
+                            '${_weather?.date != null ? DateFormat('HH:mm').format(_weather!.date!) : ""}',
+                            style: TextStyle(
+                                fontSize: screenheight * 0.03,
+                                color: Colors.white)),
                       ],
                     ),
                     Align(
@@ -1060,7 +1087,7 @@ class HomeCityState extends State<HomeCity> {
                     left: screenwidth * 0.04,
                     right: screenwidth * 0.04),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(255, 255, 255, 0.25),
+                    color: Color.fromRGBO(43, 40, 40, 0.247),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1087,7 +1114,7 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(255, 255, 255, 0.25),
+                        color: Color.fromRGBO(43, 40, 40, 0.247),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1114,7 +1141,7 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(255, 255, 255, 0.25),
+                        color: Color.fromRGBO(43, 40, 40, 0.247),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1144,7 +1171,7 @@ class HomeCityState extends State<HomeCity> {
                     left: screenwidth * 0.04,
                     right: screenwidth * 0.04),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(255, 255, 255, 0.25),
+                    color: Color.fromRGBO(43, 40, 40, 0.247),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1170,7 +1197,7 @@ class HomeCityState extends State<HomeCity> {
                   left: screenwidth * 0.04,
                   right: screenwidth * 0.04),
               decoration: BoxDecoration(
-                  color: Color.fromRGBO(255, 255, 255, 0.25),
+                  color: Color.fromRGBO(43, 40, 40, 0.247),
                   borderRadius: BorderRadius.circular(25.0)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1200,7 +1227,7 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(255, 255, 255, 0.25),
+                        color: Color.fromRGBO(43, 40, 40, 0.247),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -1227,15 +1254,15 @@ class HomeCityState extends State<HomeCity> {
                         left: screenwidth * 0.04,
                         right: screenwidth * 0.04),
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(255, 255, 255, 0.25),
+                        color: Color.fromRGBO(43, 40, 40, 0.247),
                         borderRadius: BorderRadius.circular(25.0)),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text('${_aqi?.place}',
+                        Text('${_weather?.areaName}',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: screenheight * 0.01))
+                                fontSize: screenheight * 0.02))
                       ],
                     )),
               ],
@@ -1250,7 +1277,7 @@ class HomeCityState extends State<HomeCity> {
                     left: screenwidth * 0.04,
                     right: screenwidth * 0.04),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(255, 255, 255, 0.25),
+                    color: Color.fromRGBO(43, 40, 40, 0.247),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1282,11 +1309,19 @@ class HomeCityState extends State<HomeCity> {
                             '${_weather?.sunset != null ? DateFormat('HH:mm').format(_weather!.sunset!) : ""}',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: screenheight * 0.023))
+                                fontSize: screenheight * 0.023)),
                       ],
                     )
                   ],
                 )),
+            SizedBox(height: screenheight * 0.02),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                'Weather data provided by OpenWeather and World Air Quality Index (WAQI)',
+                style: TextStyle(fontSize: screenheight * 0.013),
+              ),
+            ),
           ],
         ),
       ],
