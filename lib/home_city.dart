@@ -7,6 +7,8 @@ import 'package:air_quality_waqi/air_quality_waqi.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/ui/weather_info_card.dart';
+import 'package:weather_app/ui/weather_summary.dart';
 import 'aqi_cond.dart';
 import 'get_direction.dart';
 import 'wrapper_scene.dart';
@@ -394,61 +396,11 @@ class HomeCityState extends State<HomeCity> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25.0),
                   color: Color.fromRGBO(43, 40, 40, 0.247)),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            _weather?.areaName ?? "",
-                            style: TextStyle(
-                                fontSize: screenheight * 0.02,
-                                color: Colors.white),
-                          ),
-                        ),
-                        Text(
-                          '${_weather?.temperature?.celsius?.toStringAsFixed(2) ?? ""}°C',
-                          style: TextStyle(
-                              fontSize: screenheight * 0.04,
-                              color: Colors.white),
-                        ),
-                        Text(_weather?.weatherMain ?? "",
-                            style: TextStyle(
-                                fontSize: screenheight * 0.03,
-                                color: Colors.white)),
-                        Text(
-                            'Feels Like: ${_weather?.tempFeelsLike?.celsius?.toStringAsFixed(1)}°C',
-                            style: TextStyle(
-                                fontSize: screenheight * 0.02,
-                                color: Colors.white)),
-                        Text(
-                            '${_weather?.tempMax?.celsius?.toStringAsFixed(1) ?? ""}°C , ${_weather?.tempMin?.celsius?.toStringAsFixed(1) ?? ""}°C',
-                            style: TextStyle(
-                                fontSize: screenheight * 0.02,
-                                color: Colors.white)),
-                        Text(
-                            '${_weather?.date != null ? DateFormat('HH:mm').format(_weather!.date!) : ""}',
-                            style: TextStyle(
-                                fontSize: screenheight * 0.03,
-                                color: Colors.white)),
-                      ],
-                    ),
-                    Align(
-                      child: Container(
-                        height: screenheight * 0.20,
-                        width: screenwidth * 0.30,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                          image: NetworkImage(
-                              "https://openweathermap.org/img/wn/${_weather?.weatherIcon}@2x.png"),
-                        )),
-                      ),
-                    )
-                  ]),
+              child: WeatherSummary(
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+                weather: _weather!,
+              ),
             ),
             Container(
                 width: screenwidth * 0.8,
@@ -476,146 +428,41 @@ class HomeCityState extends State<HomeCity> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                    height: screenheight * 0.1,
-                    width: screenwidth * 0.4,
-                    padding: EdgeInsets.all(20.0),
-                    margin: EdgeInsets.only(
-                        top: screenheight * 0.01,
-                        bottom: screenheight * 0.01,
-                        left: screenwidth * 0.04,
-                        right: screenwidth * 0.04),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(43, 40, 40, 0.247),
-                        borderRadius: BorderRadius.circular(25.0)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          'Humidity',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenheight * 0.015),
-                        ),
-                        Text('${_weather?.humidity?.toStringAsFixed(1)}%',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenheight * 0.027))
-                      ],
-                    )),
-                Container(
-                    height: screenheight * 0.1,
-                    width: screenwidth * 0.4,
-                    padding: EdgeInsets.all(20.0),
-                    margin: EdgeInsets.only(
-                        top: screenheight * 0.01,
-                        bottom: screenheight * 0.01,
-                        left: screenwidth * 0.04,
-                        right: screenwidth * 0.04),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(43, 40, 40, 0.247),
-                        borderRadius: BorderRadius.circular(25.0)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          'Pressure (mmHg)',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenheight * 0.015),
-                        ),
-                        Text(
-                            '${(_weather?.pressure != null) ? (_weather!.pressure! * 0.75) : null}',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenheight * 0.027))
-                      ],
-                    )),
+                WeatherInfoCard(
+                    isThin: true,
+                    screenheight: screenheight,
+                    screenwidth: screenwidth,
+                    title: 'Humidity',
+                    body: '${_weather?.humidity?.toStringAsFixed(1)}%'),
+                WeatherInfoCard(
+                    isThin: true,
+                    screenheight: screenheight,
+                    screenwidth: screenwidth,
+                    title: "Pressure (mmHg)",
+                    body:
+                        '${(_weather?.pressure != null) ? (_weather!.pressure! * 0.75) : null}')
               ],
             ),
-            Container(
-                height: screenheight * 0.1,
-                width: screenwidth * 0.8,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.only(
-                    top: screenheight * 0.01,
-                    bottom: screenheight * 0.01,
-                    left: screenwidth * 0.04,
-                    right: screenwidth * 0.04),
-                decoration: BoxDecoration(
-                    color: Color.fromRGBO(43, 40, 40, 0.247),
-                    borderRadius: BorderRadius.circular(25.0)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      'Air Quality Index (AQI)',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: screenheight * 0.015),
-                    ),
-                    Text('${_aqi?.airQualityIndex}, ${get_aqi}',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: screenheight * 0.023))
-                  ],
-                )),
-            Container(
-              height: screenheight * 0.1,
-              width: screenwidth * 0.8,
-              padding: EdgeInsets.all(20.0),
-              margin: EdgeInsets.only(
-                  top: screenheight * 0.01,
-                  bottom: screenheight * 0.01,
-                  left: screenwidth * 0.04,
-                  right: screenwidth * 0.04),
-              decoration: BoxDecoration(
-                  color: Color.fromRGBO(43, 40, 40, 0.247),
-                  borderRadius: BorderRadius.circular(25.0)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    'Wind',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: screenheight * 0.015),
-                  ),
-                  Text(
-                      '${_weather?.windSpeed} kmph, ${_weather?.windDegree}°, ${direc}',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: screenheight * 0.023))
-                ],
-              ),
-            ),
+            WeatherInfoCard(
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+                title: "Air Quality Index (AQI)",
+                body: "${_aqi?.airQualityIndex}, ${get_aqi}"),
+            WeatherInfoCard(
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+                title: "Wind",
+                body:
+                    '${_weather?.windSpeed} kmph, ${_weather?.windDegree}°, ${direc}'),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                    height: screenheight * 0.1,
-                    width: screenwidth * 0.4,
-                    padding: EdgeInsets.all(20.0),
-                    margin: EdgeInsets.only(
-                        top: screenheight * 0.01,
-                        bottom: screenheight * 0.01,
-                        left: screenwidth * 0.04,
-                        right: screenwidth * 0.04),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(43, 40, 40, 0.247),
-                        borderRadius: BorderRadius.circular(25.0)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                          'Clouds',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenheight * 0.015),
-                        ),
-                        Text('${_weather?.cloudiness}%',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenheight * 0.027))
-                      ],
-                    )),
+                WeatherInfoCard(
+                    isThin: true,
+                    screenheight: screenheight,
+                    screenwidth: screenwidth,
+                    title: "Clouds",
+                    body: '${_weather?.cloudiness}%'),
                 Container(
                     height: screenheight * 0.1,
                     width: screenwidth * 0.4,
