@@ -7,6 +7,7 @@ import 'package:air_quality_waqi/air_quality_waqi.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/ui/two_parameter_info_card.dart';
 import 'package:weather_app/ui/weather_info_card.dart';
 import 'package:weather_app/ui/weather_summary.dart';
 import 'aqi_cond.dart';
@@ -309,14 +310,14 @@ class HomeCityState extends State<HomeCity> {
                     child: Text(
                       DateFormat('dd').format(forecast.date!),
                       style: TextStyle(
-                          color: Colors.white, fontSize: screenheight * 0.025),
+                          color: Colors.white, fontSize: screenheight * 0.023),
                     )),
                 SizedBox(
                     width: screenwidth * 0.15,
                     child: Text(
                       '${forecast.temperature?.celsius?.toStringAsFixed(1)}°C',
                       style: TextStyle(
-                          color: Colors.white, fontSize: screenheight * 0.025),
+                          color: Colors.white, fontSize: screenheight * 0.023),
                     )),
                 Align(
                   child: Container(
@@ -337,7 +338,7 @@ class HomeCityState extends State<HomeCity> {
                     child: Text(
                       '${forecast.weatherDescription}',
                       style: TextStyle(
-                          color: Colors.white, fontSize: screenheight * 0.025),
+                          color: Colors.white, fontSize: screenheight * 0.023),
                     ),
                   ),
                 )
@@ -395,7 +396,7 @@ class HomeCityState extends State<HomeCity> {
               padding: EdgeInsets.all(20.0),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25.0),
-                  color: Color.fromRGBO(43, 40, 40, 0.247)),
+                  color: Color.fromRGBO(43, 40, 40, 0.5)),
               child: WeatherSummary(
                 screenheight: screenheight,
                 screenwidth: screenwidth,
@@ -411,7 +412,7 @@ class HomeCityState extends State<HomeCity> {
                     left: screenwidth * 0.04,
                     right: screenwidth * 0.04),
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(43, 40, 40, 0.247),
+                    color: Color.fromRGBO(43, 40, 40, 0.5),
                     borderRadius: BorderRadius.circular(25.0)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -463,76 +464,23 @@ class HomeCityState extends State<HomeCity> {
                     screenwidth: screenwidth,
                     title: "Clouds",
                     body: '${_weather?.cloudiness}%'),
-                Container(
-                    height: screenheight * 0.1,
-                    width: screenwidth * 0.4,
-                    padding: EdgeInsets.all(20.0),
-                    margin: EdgeInsets.only(
-                        top: screenheight * 0.01,
-                        bottom: screenheight * 0.01,
-                        left: screenwidth * 0.04,
-                        right: screenwidth * 0.04),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(43, 40, 40, 0.247),
-                        borderRadius: BorderRadius.circular(25.0)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text('${_weather?.areaName}',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenheight * 0.02))
-                      ],
-                    )),
+                WeatherInfoCard(
+                    screenheight: screenheight,
+                    screenwidth: screenwidth,
+                    title: 'Area',
+                    body: '${_weather?.areaName}',
+                    isThin: true)
               ],
             ),
-            Container(
-                height: screenheight * 0.1,
-                width: screenwidth * 0.8,
-                padding: EdgeInsets.all(20.0),
-                margin: EdgeInsets.only(
-                    top: screenheight * 0.01,
-                    bottom: screenheight * 0.01,
-                    left: screenwidth * 0.04,
-                    right: screenwidth * 0.04),
-                decoration: BoxDecoration(
-                    color: Color.fromRGBO(43, 40, 40, 0.247),
-                    borderRadius: BorderRadius.circular(25.0)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          'Sunrise',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenheight * 0.015),
-                        ),
-                        Text(
-                            '${_weather?.sunrise != null ? DateFormat('HH:mm').format(_weather!.sunrise!) : ""}',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenheight * 0.023))
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Sunset',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: screenheight * 0.015),
-                        ),
-                        Text(
-                            '${_weather?.sunset != null ? DateFormat('HH:mm').format(_weather!.sunset!) : ""}',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: screenheight * 0.023)),
-                      ],
-                    )
-                  ],
-                )),
+            TwoParameterInfoCard(
+                screenheight: screenheight,
+                screenwidth: screenwidth,
+                title1: 'Sunrise',
+                body1:
+                    '${_weather?.sunrise != null ? DateFormat('HH:mm').format(_weather!.sunrise!) : ""}',
+                title2: 'Sunset',
+                body2:
+                    '${_weather?.sunset != null ? DateFormat('HH:mm').format(_weather!.sunset!) : ""}'),
             SizedBox(height: screenheight * 0.02),
             Align(
               alignment: Alignment.bottomCenter,
