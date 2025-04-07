@@ -7,14 +7,12 @@ import 'package:air_quality_waqi/air_quality_waqi.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
 import 'package:http/http.dart' as http;
-import 'package:weather_app/searchpage.dart';
 import 'package:weather_app/ui/two_parameter_info_card.dart';
 import 'package:weather_app/ui/weather_info_card.dart';
 import 'package:weather_app/ui/weather_summary.dart';
 import 'aqi_cond.dart';
 import 'get_direction.dart';
 import 'wrapper_scene.dart';
-import 'searchpage.dart';
 
 Weather? _weather;
 List<Weather>? _forecast;
@@ -280,25 +278,6 @@ class HomeCityState extends State<HomeCity> {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_city_sharp),
-            label: 'Locations',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 0) {
-          } else if (index == 1) {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => SearchPage()));
-          }
-        },
       ),
     );
   }
