@@ -28,7 +28,6 @@ class HomeCity extends StatefulWidget {
 class HomeCityState extends State<HomeCity> {
   WeatherFactory? wf;
   AirQualityWaqi? airquality;
-  Key _key = UniqueKey();
   TextEditingController _cityController = TextEditingController();
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
@@ -198,88 +197,8 @@ class HomeCityState extends State<HomeCity> {
       _aqi = null;
       wf = null;
       airquality = null;
-      _key = UniqueKey();
       _initializeWeather();
     });
-  }
-
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          app_ui(),
-          Positioned(
-            width: MediaQuery.of(context).size.width * 0.35,
-            top: MediaQuery.of(context).size.height * 0.05,
-            right: MediaQuery.of(context).size.width * 0.23,
-            child: Column(
-              children: [
-                TextField(
-                  controller: _cityController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Color.fromRGBO(255, 255, 255, 0.5),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                        borderSide: BorderSide.none),
-                    hintText: 'Search city',
-                  ),
-                ),
-                if (_isLoading)
-                  CircularProgressIndicator()
-                else if (_errorMessage.isNotEmpty)
-                  Text(_errorMessage, style: TextStyle(color: Colors.red))
-                else if (_searchResults.isNotEmpty)
-                  Container(
-                    height: 200, // Adjust height as needed
-                    width: MediaQuery.of(context).size.width * 0.35,
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(255, 255, 255, 0.7),
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    child: ListView.builder(
-                      itemCount: _searchResults.length,
-                      itemBuilder: (context, index) {
-                        final city = _searchResults[index];
-                        return ListTile(
-                          title: Text(city['name']),
-                          subtitle: Text(
-                              '${city['state'] ?? ''}, ${city['country']}'),
-                          onTap: () {
-                            // Fetch weather data for the selected city
-                            _fetchWeatherDataByCity(city['name']);
-                            // Clear search results and close dropdown
-                            setState(() {
-                              _searchResults = [];
-                              _cityController.text = city['name'];
-                            });
-                            FocusScope.of(context)
-                                .unfocus(); // Remove focus from TextField
-                          },
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.05,
-            right: MediaQuery.of(context).size.width * 0.04,
-            child: FloatingActionButton(
-              onPressed: refreshPage,
-              child: Icon(
-                Icons.refresh,
-                color: Colors.black,
-              ),
-              elevation: 0,
-              backgroundColor: Color.fromRGBO(255, 255, 255, 0.5),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget forecastList() {
@@ -492,6 +411,144 @@ class HomeCityState extends State<HomeCity> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 0, 100, 181),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // Opens the drawer
+              },
+            );
+          },
+        ),
+        title: SizedBox(
+          width: 200, // Adjust the width of the TextField
+          child: TextField(
+            controller: _cityController,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                _searchCities(value); // Trigger city search as the user types
+              } else {
+                setState(() {
+                  _searchResults = []; // Clear results if input is empty
+                });
+              }
+            },
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Color.fromRGBO(255, 255, 255, 0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide.none,
+              ),
+              hintText: 'Search city',
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+            ),
+            style: TextStyle(fontSize: 14.0),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: refreshPage, // Call the refreshPage method
+            tooltip: 'Refresh',
+          ),
+        ],
+      ),
+      drawer: drawer(),
+      body: Stack(
+        children: [
+          app_ui(),
+          if (_searchResults.isNotEmpty)
+            Positioned(
+              top: kToolbarHeight * 0.3, // Position below the AppBar
+              left: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(230),
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4.0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _searchResults.length,
+                  itemBuilder: (context, index) {
+                    final city = _searchResults[index];
+                    return ListTile(
+                      title: Text(city['name']),
+                      subtitle:
+                          Text('${city['state'] ?? ''}, ${city['country']}'),
+                      onTap: () {
+                        _fetchWeatherDataByCity(city['name']);
+                        setState(() {
+                          _searchResults = [];
+                          _cityController.text = city['name'];
+                        });
+                        FocusScope.of(context)
+                            .unfocus(); // Remove focus from TextField
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget drawer() {
+    return Drawer(
+      backgroundColor: Colors.black,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Color.fromARGB(255, 0, 100, 181),
+            ),
+            child: Text(
+              'Locations',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 30,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.map, color: Colors.white),
+            title: const Text('Home', style: TextStyle(color: Colors.white)),
+          ),
+          const Divider(
+            height: 10,
+            thickness: 1,
+            indent: 10,
+            endIndent: 10,
+            color: Colors.white,
+          ),
+          ListTile(
+            leading: const Icon(Icons.add, color: Colors.white),
+            title: const Text('Add locations',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }
