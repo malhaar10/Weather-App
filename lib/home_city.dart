@@ -14,6 +14,7 @@ import 'package:weather_app/ui/weather_summary.dart';
 import 'aqi_cond.dart';
 import 'get_direction.dart';
 import 'wrapper_scene.dart';
+import 'database.dart';
 
 Weather? _weather;
 List<Weather>? _forecast;
@@ -547,6 +548,10 @@ class HomeCityState extends State<HomeCity> {
           ListTile(
             leading: const Icon(Icons.map, color: Colors.white),
             title: const Text('Nagpur', style: TextStyle(color: Colors.white)),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.white),
+              onPressed: () {},
+            ),
             onTap: () {
               Navigator.pop(context);
               _fetchWeatherDataByCity('Nagpur');
