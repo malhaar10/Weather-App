@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -35,6 +36,7 @@ class HomeCityState extends State<HomeCity> {
   String _lastText = "";
   String? iconString;
   String ow_link = 'https://openweathermap.org/';
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -44,23 +46,19 @@ class HomeCityState extends State<HomeCity> {
     _cityController.addListener(_onCityTextChanged);
   }
 
-  @override
-  void dispose() {
-    _cityController.removeListener(_onCityTextChanged);
-    _cityController.dispose();
-    super.dispose();
-  }
-
   void _onCityTextChanged() {
-    Future.delayed(Duration(milliseconds: 500), () {
-      if (_cityController.text.isNotEmpty &&
-          mounted &&
-          _cityController.text == _lastText) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(Duration(milliseconds: 500), () {
+      if (_cityController.text.isNotEmpty && mounted) {
         _searchCities(_cityController.text);
       }
     });
+  }
 
-    _lastText = _cityController.text;
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   Future<void> _searchCities(String cityName) async {
@@ -534,6 +532,25 @@ class HomeCityState extends State<HomeCity> {
           ListTile(
             leading: const Icon(Icons.map, color: Colors.white),
             title: const Text('Home', style: TextStyle(color: Colors.white)),
+            onTap: () async {
+              Navigator.pop(context);
+              _initializeWeather();
+            },
+          ),
+          const Divider(
+            height: 10,
+            thickness: 1,
+            indent: 10,
+            endIndent: 10,
+            color: Colors.white,
+          ),
+          ListTile(
+            leading: const Icon(Icons.map, color: Colors.white),
+            title: const Text('Nagpur', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              _fetchWeatherDataByCity('Nagpur');
+            },
           ),
           const Divider(
             height: 10,
@@ -546,9 +563,89 @@ class HomeCityState extends State<HomeCity> {
             leading: const Icon(Icons.add, color: Colors.white),
             title: const Text('Add locations',
                 style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              _showAddLocationDialog();
+            },
           ),
         ],
       ),
+    );
+  }
+
+  String getCityInput() {
+    // Declare a TextEditingController to manage the text field's value
+    TextEditingController _textController = TextEditingController();
+    String _textValue = ""; // Variable to store the value
+
+    @override
+    void initState() {
+      super.initState();
+      // Add a listener to update the variable whenever the text changes
+      _textController.addListener(() {
+        setState(() {
+          _textValue = _textController.text;
+        });
+      });
+    }
+
+    @override
+    void dispose() {
+      _textController.dispose(); // Dispose the controller when done
+      super.dispose();
+    }
+
+    return _textValue;
+  }
+
+  void _showAddLocationDialog() {
+    TextEditingController _textController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          title: const Text(
+            'Add Location',
+            style: TextStyle(color: Colors.white),
+          ),
+          content: TextField(
+            controller: _textController,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              hintText: 'Enter city name',
+              hintStyle: TextStyle(color: Colors.grey),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                String cityName = _textController.text;
+                if (cityName.isNotEmpty) {
+                  Navigator.pop(context); // Close the dialog
+                  _fetchWeatherDataByCity(
+                      cityName); // Fetch weather for the entered city
+                }
+              },
+              child: const Text('Add', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
