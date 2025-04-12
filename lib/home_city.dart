@@ -7,6 +7,7 @@ import 'package:weather/weather.dart';
 import 'package:air_quality_waqi/air_quality_waqi.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/ui/two_parameter_info_card.dart';
 import 'package:weather_app/ui/weather_info_card.dart';
@@ -14,7 +15,6 @@ import 'package:weather_app/ui/weather_summary.dart';
 import 'aqi_cond.dart';
 import 'get_direction.dart';
 import 'wrapper_scene.dart';
-import 'database.dart';
 
 Weather? _weather;
 List<Weather>? _forecast;
@@ -28,6 +28,7 @@ class HomeCity extends StatefulWidget {
 }
 
 class HomeCityState extends State<HomeCity> {
+  List<String> cityList = [];
   WeatherFactory? wf;
   AirQualityWaqi? airquality;
   TextEditingController _cityController = TextEditingController();
@@ -43,7 +44,7 @@ class HomeCityState extends State<HomeCity> {
   void initState() {
     super.initState();
     _initializeWeather();
-    // Listen for changes in the TextField
+    loadCityList(); // Load the saved city list
     _cityController.addListener(_onCityTextChanged);
   }
 
@@ -538,13 +539,6 @@ class HomeCityState extends State<HomeCity> {
               _initializeWeather();
             },
           ),
-          const Divider(
-            height: 10,
-            thickness: 1,
-            indent: 10,
-            endIndent: 10,
-            color: Colors.white,
-          ),
           ListTile(
             leading: const Icon(Icons.map, color: Colors.white),
             title: const Text('Nagpur', style: TextStyle(color: Colors.white)),
@@ -557,13 +551,7 @@ class HomeCityState extends State<HomeCity> {
               _fetchWeatherDataByCity('Nagpur');
             },
           ),
-          const Divider(
-            height: 10,
-            thickness: 1,
-            indent: 10,
-            endIndent: 10,
-            color: Colors.white,
-          ),
+          dynamicCityListTiles(),
           ListTile(
             leading: const Icon(Icons.add, color: Colors.white),
             title: const Text('Add locations',
@@ -641,9 +629,10 @@ class HomeCityState extends State<HomeCity> {
               onPressed: () {
                 String cityName = _textController.text;
                 if (cityName.isNotEmpty) {
+                  setState(() {
+                    addCityToDrawer(cityName); // Add the city to the drawer
+                  });
                   Navigator.pop(context); // Close the dialog
-                  _fetchWeatherDataByCity(
-                      cityName); // Fetch weather for the entered city
                 }
               },
               child: const Text('Add', style: TextStyle(color: Colors.white)),
@@ -652,5 +641,69 @@ class HomeCityState extends State<HomeCity> {
         );
       },
     );
+  }
+
+  void manageCityList(String action, {String? cityName}) {
+    if (action == 'add' && cityName != null && cityName.isNotEmpty) {
+      if (!cityList.contains(cityName)) {
+        setState(() {
+          cityList.add(cityName); // Add city to the list
+        });
+        saveCityList(); // Save the updated list
+      }
+    } else if (action == 'delete' && cityName != null && cityName.isNotEmpty) {
+      setState(() {
+        cityList.remove(cityName); // Remove city from the list
+      });
+      saveCityList(); // Save the updated list
+    }
+  }
+
+  void addCityToDrawer(String cityName) {
+    if (cityName.isNotEmpty && !cityList.contains(cityName)) {
+      setState(() {
+        cityList.add(cityName); // Add the city to the list
+      });
+      saveCityList(); // Save the updated list
+    }
+  }
+
+  Widget dynamicCityListTiles() {
+    return Column(
+      children: cityList.map((cityName) {
+        return ListTile(
+          leading: const Icon(Icons.map, color: Colors.white),
+          title: Text(cityName, style: const TextStyle(color: Colors.white)),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete, color: Colors.white),
+            onPressed: () {
+              setState(() {
+                cityList.remove(cityName); // Remove the city from the list
+              });
+            },
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            _fetchWeatherDataByCity(
+                cityName); // Fetch weather for the selected city
+          },
+        );
+      }).toList(),
+    );
+  }
+
+  Future<void> saveCityList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('cityList', cityList); // Save the city list
+  }
+
+  Future<void> loadCityList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? savedList = prefs.getStringList('cityList');
+    if (savedList != null) {
+      setState(() {
+        cityList = savedList; // Load the saved city list
+      });
+    }
   }
 }
