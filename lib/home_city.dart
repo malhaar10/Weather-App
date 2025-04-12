@@ -414,104 +414,6 @@ class HomeCityState extends State<HomeCity> {
     );
   }
 
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 0, 100, 181),
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer(); // Opens the drawer
-              },
-            );
-          },
-        ),
-        title: SizedBox(
-          width: 200, // Adjust the width of the TextField
-          child: TextField(
-            controller: _cityController,
-            onChanged: (value) {
-              if (value.isNotEmpty) {
-                _searchCities(value); // Trigger city search as the user types
-              } else {
-                setState(() {
-                  _searchResults = []; // Clear results if input is empty
-                });
-              }
-            },
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Color.fromRGBO(255, 255, 255, 0.5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide.none,
-              ),
-              hintText: 'Search city',
-              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
-            ),
-            style: TextStyle(fontSize: 14.0),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: refreshPage, // Call the refreshPage method
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
-      drawer: drawer(),
-      body: Stack(
-        children: [
-          app_ui(),
-          if (_searchResults.isNotEmpty)
-            Positioned(
-              top: kToolbarHeight * 0.3, // Position below the AppBar
-              left: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(230),
-                  borderRadius: BorderRadius.circular(8.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4.0,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _searchResults.length,
-                  itemBuilder: (context, index) {
-                    final city = _searchResults[index];
-                    return ListTile(
-                      title: Text(city['name']),
-                      subtitle:
-                          Text('${city['state'] ?? ''}, ${city['country']}'),
-                      onTap: () {
-                        _fetchWeatherDataByCity(city['name']);
-                        setState(() {
-                          _searchResults = [];
-                          _cityController.text = city['name'];
-                        });
-                        FocusScope.of(context)
-                            .unfocus(); // Remove focus from TextField
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   Widget drawer() {
     return Drawer(
       backgroundColor: Colors.black,
@@ -537,18 +439,6 @@ class HomeCityState extends State<HomeCity> {
             onTap: () async {
               Navigator.pop(context);
               _initializeWeather();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.map, color: Colors.white),
-            title: const Text('Nagpur', style: TextStyle(color: Colors.white)),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.white),
-              onPressed: () {},
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _fetchWeatherDataByCity('Nagpur');
             },
           ),
           dynamicCityListTiles(),
@@ -679,6 +569,7 @@ class HomeCityState extends State<HomeCity> {
             onPressed: () {
               setState(() {
                 cityList.remove(cityName); // Remove the city from the list
+                saveCityList(); // Save the updated list to persist changes
               });
             },
           ),
@@ -705,5 +596,103 @@ class HomeCityState extends State<HomeCity> {
         cityList = savedList; // Load the saved city list
       });
     }
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 0, 100, 181),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // Opens the drawer
+              },
+            );
+          },
+        ),
+        title: SizedBox(
+          width: 200, // Adjust the width of the TextField
+          child: TextField(
+            controller: _cityController,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                _searchCities(value); // Trigger city search as the user types
+              } else {
+                setState(() {
+                  _searchResults = []; // Clear results if input is empty
+                });
+              }
+            },
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Color.fromRGBO(255, 255, 255, 0.5),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderSide: BorderSide.none,
+              ),
+              hintText: 'Search city',
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 8),
+            ),
+            style: TextStyle(fontSize: 14.0),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: refreshPage, // Call the refreshPage method
+            tooltip: 'Refresh',
+          ),
+        ],
+      ),
+      drawer: drawer(),
+      body: Stack(
+        children: [
+          app_ui(),
+          if (_searchResults.isNotEmpty)
+            Positioned(
+              top: kToolbarHeight * 0.3, // Position below the AppBar
+              left: 16,
+              right: 16,
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(230),
+                  borderRadius: BorderRadius.circular(8.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4.0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _searchResults.length,
+                  itemBuilder: (context, index) {
+                    final city = _searchResults[index];
+                    return ListTile(
+                      title: Text(city['name']),
+                      subtitle:
+                          Text('${city['state'] ?? ''}, ${city['country']}'),
+                      onTap: () {
+                        _fetchWeatherDataByCity(city['name']);
+                        setState(() {
+                          _searchResults = [];
+                          _cityController.text = city['name'];
+                        });
+                        FocusScope.of(context)
+                            .unfocus(); // Remove focus from TextField
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
