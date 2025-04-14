@@ -9,12 +9,14 @@ import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/login.dart';
 import 'package:weather_app/ui/two_parameter_info_card.dart';
 import 'package:weather_app/ui/weather_info_card.dart';
 import 'package:weather_app/ui/weather_summary.dart';
 import 'aqi_cond.dart';
 import 'get_direction.dart';
 import 'wrapper_scene.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 Weather? _weather;
 List<Weather>? _forecast;
@@ -50,7 +52,7 @@ class HomeCityState extends State<HomeCity> {
 
   void _onCityTextChanged() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(Duration(milliseconds: 500), () {
+    _debounce = Timer(Duration(milliseconds: 1000), () {
       if (_cityController.text.isNotEmpty && mounted) {
         _searchCities(_cityController.text);
       }
@@ -449,6 +451,24 @@ class HomeCityState extends State<HomeCity> {
             onTap: () {
               Navigator.pop(context);
               _showAddLocationDialog();
+            },
+          ),
+          const Divider(color: Colors.white), // Add a divider for better UI
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.white),
+            title: const Text('Logout', style: TextStyle(color: Colors.white)),
+            onTap: () async {
+              // Log out using FirebaseAuth
+              await FirebaseAuth.instance.signOut();
+
+              // Set login state to false and navigate to LoginPage
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setBool('isLoggedIn', false);
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
             },
           ),
         ],
