@@ -17,7 +17,7 @@ class WeatherInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double containerwidthfactor = isThin ? 0.4 : 0.8;
-    final double bodyfontsizefactor = isThin ? 0.027 : 0.023;
+    final double bodyfontsizefactor = isThin ? 0.027 : 0.021;
     return Container(
         height: screenheight * 0.1,
         width: screenwidth * containerwidthfactor,
@@ -36,7 +36,7 @@ class WeatherInfoCard extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                  color: Colors.white, fontSize: screenheight * 0.015),
+                  color: Colors.white, fontSize: screenheight * 0.013),
             ),
             Text(body,
                 style: TextStyle(

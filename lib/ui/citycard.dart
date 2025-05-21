@@ -13,7 +13,7 @@ class CityCard extends StatelessWidget {
 
   Widget build(BuildContext context) {
     final double containerwidthfactor = 0.8;
-    final double bodyfontsizefactor = 0.023;
+    final double bodyfontsizefactor = 0.021;
     return Container(
         height: screenheight * 0.1,
         width: screenwidth * containerwidthfactor,

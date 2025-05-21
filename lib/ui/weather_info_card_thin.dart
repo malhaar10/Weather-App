@@ -37,7 +37,7 @@ class WeatherInfoCardThin extends StatelessWidget {
             ),
             Text(body,
                 style: TextStyle(
-                    color: Colors.white, fontSize: screenheight * 0.027))
+                    color: Colors.white, fontSize: screenheight * 0.025))
           ],
         ));
   }
