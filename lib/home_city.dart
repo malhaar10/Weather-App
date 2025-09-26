@@ -9,14 +9,12 @@ import 'package:intl/intl.dart';
 import 'package:weather_animation/weather_animation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:weather_app/login.dart';
 import 'package:weather_app/ui/two_parameter_info_card.dart';
 import 'package:weather_app/ui/weather_info_card.dart';
 import 'package:weather_app/ui/weather_summary.dart';
 import 'aqi_cond.dart';
 import 'get_direction.dart';
 import 'wrapper_scene.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 Weather? _weather;
 List<Weather>? _forecast;
@@ -458,16 +456,14 @@ class HomeCityState extends State<HomeCity> {
             leading: const Icon(Icons.logout, color: Colors.white),
             title: const Text('Logout', style: TextStyle(color: Colors.white)),
             onTap: () async {
-              // Log out using FirebaseAuth
-              await FirebaseAuth.instance.signOut();
-
-              // Set login state to false and navigate to LoginPage
+              // Simple logout - clear login state
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.setBool('isLoggedIn', false);
 
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
+              // Exit the app or show a message
+              Navigator.pop(context); // Close the drawer first
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Logged out successfully')),
               );
             },
           ),
@@ -477,28 +473,8 @@ class HomeCityState extends State<HomeCity> {
   }
 
   String getCityInput() {
-    // Declare a TextEditingController to manage the text field's value
-    TextEditingController _textController = TextEditingController();
-    String _textValue = ""; // Variable to store the value
-
-    @override
-    void initState() {
-      super.initState();
-      // Add a listener to update the variable whenever the text changes
-      _textController.addListener(() {
-        setState(() {
-          _textValue = _textController.text;
-        });
-      });
-    }
-
-    @override
-    void dispose() {
-      _textController.dispose(); // Dispose the controller when done
-      super.dispose();
-    }
-
-    return _textValue;
+    // Return empty string as this method seems to be incomplete
+    return "";
   }
 
   void _showAddLocationDialog() {
@@ -716,3 +692,169 @@ class HomeCityState extends State<HomeCity> {
     );
   }
 }
+//   // Method to get weather animation scene based on weather conditions
+//   WrapperScene? getScene(String? iconString, int? weatherConditionCode) {
+//     if (iconString == null && weatherConditionCode == null) {
+//       return WrapperScene(
+//         sizeCanvas: Size(200, 200),
+//         isLeftCornerGradient: true,
+//         colors: [Colors.blue.shade300, Colors.blue.shade600],
+//         children: [
+//           CloudWidget(
+//             cloudConfig: CloudConfig(
+//               size: 60,
+//               color: Colors.white,
+//               icon: IconData(0xe48f, fontFamily: 'MaterialIcons'),
+//               widgetCloud: Container(),
+//             ),
+//           ),
+//         ],
+//       );
+//     }
+
+//     // Map weather condition codes to appropriate animations
+//     if (weatherConditionCode != null) {
+//       switch (weatherConditionCode) {
+//         case 200: // Thunderstorm
+//         case 201:
+//         case 202:
+//         case 210:
+//         case 211:
+//         case 212:
+//         case 221:
+//         case 230:
+//         case 231:
+//         case 232:
+//           return WrapperScene(
+//             sizeCanvas: Size(200, 200),
+//             isLeftCornerGradient: true,
+//             colors: [Colors.grey.shade700, Colors.grey.shade900],
+//             children: [
+//               ThunderWidget(),
+//             ],
+//           );
+
+//         case 300: // Drizzle
+//         case 301:
+//         case 302:
+//         case 310:
+//         case 311:
+//         case 312:
+//         case 313:
+//         case 314:
+//         case 321:
+//           return WrapperScene(
+//             sizeCanvas: Size(200, 200),
+//             isLeftCornerGradient: true,
+//             colors: [Colors.grey.shade400, Colors.grey.shade600],
+//             children: [
+//               RainWidget(),
+//             ],
+//           );
+
+//         case 500: // Rain
+//         case 501:
+//         case 502:
+//         case 503:
+//         case 504:
+//         case 511:
+//         case 520:
+//         case 521:
+//         case 522:
+//         case 531:
+//           return WrapperScene(
+//             sizeCanvas: Size(200, 200),
+//             isLeftCornerGradient: true,
+//             colors: [Colors.blue.shade400, Colors.blue.shade700],
+//             children: [
+//               RainWidget(),
+//             ],
+//           );
+
+//         case 600: // Snow
+//         case 601:
+//         case 602:
+//         case 611:
+//         case 612:
+//         case 613:
+//         case 615:
+//         case 616:
+//         case 620:
+//         case 621:
+//         case 622:
+//           return WrapperScene(
+//             sizeCanvas: Size(200, 200),
+//             isLeftCornerGradient: true,
+//             colors: [Colors.blue.shade100, Colors.blue.shade300],
+//             children: [
+//               SnowWidget(),
+//             ],
+//           );
+
+//         case 800: // Clear sky
+//           return WrapperScene(
+//             sizeCanvas: Size(200, 200),
+//             isLeftCornerGradient: true,
+//             colors: [Colors.orange.shade300, Colors.yellow.shade400],
+//             children: [
+//               SunWidget(),
+//             ],
+//           );
+
+//         case 801: // Few clouds
+//         case 802: // Scattered clouds
+//         case 803: // Broken clouds
+//         case 804: // Overcast clouds
+//           return WrapperScene(
+//             sizeCanvas: Size(200, 200),
+//             isLeftCornerGradient: true,
+//             colors: [Colors.grey.shade300, Colors.grey.shade500],
+//             children: [
+//               CloudWidget(
+//                 cloudConfig: CloudConfig(
+//                   size: 60,
+//                   color: Colors.white,
+//                   icon: IconData(0xe48f, fontFamily: 'MaterialIcons'),
+//                   widgetCloud: Container(),
+//                 ),
+//               ),
+//             ],
+//           );
+
+//         default:
+//           return WrapperScene(
+//             sizeCanvas: Size(200, 200),
+//             isLeftCornerGradient: true,
+//             colors: [Colors.blue.shade300, Colors.blue.shade600],
+//             children: [
+//               CloudWidget(
+//                 cloudConfig: CloudConfig(
+//                   size: 60,
+//                   color: Colors.white,
+//                   icon: IconData(0xe48f, fontFamily: 'MaterialIcons'),
+//                   widgetCloud: Container(),
+//                 ),
+//               ),
+//             ],
+//           );
+//       }
+//     }
+
+//     // Fallback to basic cloud scene
+//     return WrapperScene(
+//       sizeCanvas: Size(200, 200),
+//       isLeftCornerGradient: true,
+//       colors: [Colors.blue.shade300, Colors.blue.shade600],
+//       children: [
+//         CloudWidget(
+//           cloudConfig: CloudConfig(
+//             size: 60,
+//             color: Colors.white,
+//             icon: IconData(0xe48f, fontFamily: 'MaterialIcons'),
+//             widgetCloud: Container(),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
